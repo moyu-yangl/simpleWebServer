@@ -1,13 +1,13 @@
 package com.simplewebserver;
 
+import com.simplewebserver.domain.Request;
 import com.simplewebserver.util.HttpUtil;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Map;
 
-public class Test {
+public class Container {
     public static void main(String[] args) throws IOException, InterruptedException {
         ServerSocket server = new ServerSocket(8080);
         for (; ; ) {
@@ -38,7 +38,7 @@ public class Test {
                 int read = is.read(bytes);
                 System.out.println(read);
                 String content = new String(bytes);
-                Map<String, String> map = HttpUtil.requestHeadBuild(content);
+                Request request = HttpUtil.requestBuild(content);
                 os = socket.getOutputStream();
                 File file = new File("src/main/resources/index.html");
                 BufferedReader reader = new BufferedReader(new FileReader(file));
