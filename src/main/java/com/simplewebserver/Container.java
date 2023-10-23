@@ -14,7 +14,6 @@ public class Container {
             Socket accept = server.accept();
             RequestTask requestTask = new RequestTask(accept);
             requestTask.start();
-
         }
 
     }
@@ -32,40 +31,43 @@ public class Container {
             OutputStream os = null;
             try {
                 is = socket.getInputStream();
-
                 int i = is.available();
-                if (i <= 0)
-                    return;
+                while (i == 0) {
+                    i = is.available();
+                }
                 byte[] bytes = new byte[i];
                 int read = is.read(bytes);
-                System.out.println(read);
                 String content = new String(bytes);
-                Request request = HttpUtil.requestBuild(content);
                 os = socket.getOutputStream();
-                File file = new File("src/main/resources/index.html");
+                Request request = HttpUtil.requestBuild(content);
+                String path = request.getHead("path");
+                File file = new File("src/main/resources" + path);
+                boolean flag = true;
+                if (!file.exists()) {
+                    flag = false;
+                    file = new File("src/main/resources" + "/404.html");
+                }
                 BufferedReader reader = new BufferedReader(new FileReader(file));
                 StringBuffer sb = new StringBuffer();
                 String line = null;
-
                 while ((line = reader.readLine()) != null) {
                     sb.append(line).append("\r\n");
                 }
-
-                StringBuffer result = new StringBuffer();
-                result.append("HTTP/1.1 200 ok \r\n");
-                result.append("Content-Language: zh-CN \r\n");
-                result.append("Content-Type: text/html;charset=UTF-8 \r\n");
-                result.append("Content-Length: " + file.length() + "\r\n");
-                result.append("\r\n" + sb.toString());
-                os.write(result.toString().getBytes());
+                String result = null;
+                if (flag) {
+                    result = HttpUtil.buildResponseStatic(sb.toString(), file.length(), 200, "ok");
+                } else {
+                    result = HttpUtil.buildResponseStatic(sb.toString(), file.length(), 404, "not find");
+                }
+                os.write(result.getBytes());
 
             } catch (IOException e) {
                 throw new RuntimeException(e);
             } finally {
                 try {
-//                    is.close();
+                    is.close();
                     os.flush();
-//                    os.close();
+                    os.close();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
