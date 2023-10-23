@@ -34,6 +34,8 @@ public class Container {
                 is = socket.getInputStream();
 
                 int i = is.available();
+                if (i <= 0)
+                    return;
                 byte[] bytes = new byte[i];
                 int read = is.read(bytes);
                 System.out.println(read);
@@ -61,9 +63,9 @@ public class Container {
                 throw new RuntimeException(e);
             } finally {
                 try {
-                    is.close();
+//                    is.close();
                     os.flush();
-                    os.close();
+//                    os.close();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

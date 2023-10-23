@@ -9,9 +9,15 @@ import java.util.List;
 import java.util.Map;
 
 public class HttpUtil {
+    public static final String[] STATIC;
+
+    static {
+        STATIC = new String[]{".html", ".js", ".css"};
+    }
+
     public static Request requestBuild(String httpContent) {
         String[] strings = httpContent.split("\r\n");
-        String path = strings[0];
+        String path = strings[0].split(" ")[1];
         List<String> heads = Arrays.asList(strings).subList(1, strings.length);
         Map<String, String> map = new HashMap<>(heads.size());
         for (String head : heads) {
@@ -20,9 +26,10 @@ public class HttpUtil {
             String headContent = head.substring(m + 2);
             map.put(headKey, headContent);
         }
-        map.put("path", path);
+        Map<String, Object> params = new HashMap<>();
+        params.put("path", path);
         ServerRequest request = ServerRequest.builder().setHeaders(map)
-                .setParams(null).build();
+                .setParams(params).build();
         return request;
     }
 }
