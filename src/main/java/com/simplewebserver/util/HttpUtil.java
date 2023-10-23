@@ -15,50 +15,58 @@ public class HttpUtil {
         STATIC = new String[]{".html", ".js", ".css"};
     }
 
-    public static Request requestBuild(String httpContent) {
-        String[] strings = httpContent.split("\r\n");
-        String[] split = strings[0].split(" ");
-        String method = split[0];
-        String path = split[1];
-        List<String> heads = Arrays.asList(strings).subList(1, strings.length);
-        Map<String, String> map = new HashMap<>(heads.size());
-        for (String head : heads) {
-            String[] head2 = head.split(": ");
-            if (head2.length >= 2) {
-                String headKey = head2[0];
-                String headContent = head2[1];
-                map.put(headKey, headContent);
+    public static Request buildRequest(String httpContent) {
+        String[] content = httpContent.split("\r\n");   // 请求报文
+        String[] oneHeader = content[0].split(" ");     // 报文首
+        String method = oneHeader[0];           // 请求方式
+        String path = oneHeader[1];             // 请求路径与参数
+
+        List<String> headers = Arrays.asList(content).subList(1, content.length);
+
+        Map<String, String> requestHeader = new HashMap<>(headers.size());
+        for (String head : headers) {
+            String[] headerKV = head.split(": ");
+            if (headerKV.length >= 2) {
+                String headKey = headerKV[0];
+                String headContent = headerKV[1];
+                requestHeader.put(headKey, headContent);
             }
         }
-        map.put("method", method);
-        Map<String, Object> params = new HashMap<>();
+        requestHeader.put("method", method);
+        Map<String, String> params = new HashMap<>();
+        /*
+        判断是否为静态资源请求
+         */
         boolean jump = false;
         for (String end : STATIC) {
             if (path.endsWith(end)) {
-                map.put("path", path);
+                requestHeader.put("path", path);
                 jump = true;
                 break;
             }
         }
-
+        /*
+        动态请求
+         */
         if (!jump) {
             int i = path.indexOf("?");
             String p = path.substring(0, i);
-            map.put("path", p);
-            String param = path.substring(i + 1);
-            String[] split1 = param.split("&");
-            for (String s : split1) {
-                String[] split2 = s.split("=");
-                params.put(split2[0], split2[1]);
+            requestHeader.put("path", p);
+
+            String paramList = path.substring(i + 1);
+            String[] paramKV = paramList.split("&");
+            for (String KV : paramKV) {
+                String[] var1 = KV.split("=");
+                params.put(var1[0], var1[1]);
             }
         }
 
-        ServerRequest request = ServerRequest.builder().setHeaders(map)
+        ServerRequest request = ServerRequest.builder().setHeaders(requestHeader)
                 .setParams(params).build();
         return request;
     }
 
-    public static String buildResponseStatic(String content, long len, int code, String message) {
+    public static String buildStaticResponse(String content, long len, int code, String message) {
         StringBuffer result = new StringBuffer();
         result.append("HTTP/1.1 " + code + " " + message + "\r\n");
         result.append("Content-Language: zh-CN \r\n");

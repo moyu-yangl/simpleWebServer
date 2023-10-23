@@ -39,7 +39,7 @@ public class Container {
                 int read = is.read(bytes);
                 String content = new String(bytes);
                 os = socket.getOutputStream();
-                Request request = HttpUtil.requestBuild(content);
+                Request request = HttpUtil.buildRequest(content);
                 String path = request.getHead("path");
                 File file = new File("src/main/resources" + path);
                 boolean flag = true;
@@ -47,6 +47,7 @@ public class Container {
                     flag = false;
                     file = new File("src/main/resources" + "/404.html");
                 }
+                
                 BufferedReader reader = new BufferedReader(new FileReader(file));
                 StringBuffer sb = new StringBuffer();
                 String line = null;
@@ -55,9 +56,9 @@ public class Container {
                 }
                 String result = null;
                 if (flag) {
-                    result = HttpUtil.buildResponseStatic(sb.toString(), file.length(), 200, "ok");
+                    result = HttpUtil.buildStaticResponse(sb.toString(), file.length(), 200, "ok");
                 } else {
-                    result = HttpUtil.buildResponseStatic(sb.toString(), file.length(), 404, "not find");
+                    result = HttpUtil.buildStaticResponse(sb.toString(), file.length(), 404, "not find");
                 }
                 os.write(result.getBytes());
 
