@@ -1,14 +1,17 @@
 package com.simplewebserver;
 
 import com.simplewebserver.domain.Request;
+import com.simplewebserver.domain.Response;
 import com.simplewebserver.util.HttpUtil;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Container {
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws IOException {
         ServerSocket server = new ServerSocket(8080);
         for (; ; ) {
             Socket accept = server.accept();
@@ -39,29 +42,17 @@ public class Container {
                 int read = is.read(bytes);
                 String content = new String(bytes);
                 os = socket.getOutputStream();
-                Request request = HttpUtil.buildRequest(content);
-                String path = request.getHead("path");
-                File file = new File("src/main/resources" + path);
-                boolean flag = true;
-                if (!file.exists()) {
-                    flag = false;
-                    file = new File("src/main/resources" + "/404.html");
-                }
-                
-                BufferedReader reader = new BufferedReader(new FileReader(file));
-                StringBuffer sb = new StringBuffer();
-                String line = null;
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line).append("\r\n");
-                }
-                String result = null;
-                if (flag) {
-                    result = HttpUtil.buildStaticResponse(sb.toString(), file.length(), 200, "ok");
-                } else {
-                    result = HttpUtil.buildStaticResponse(sb.toString(), file.length(), 404, "not find");
-                }
-                os.write(result.getBytes());
 
+                Request request = HttpUtil.buildRequest(content);
+                Response response = HttpUtil.buildResponse(request);
+
+                if (request.isStatic()) {
+                    HttpUtil.buildStaticResponse(request, response);
+                } else {
+                    HttpUtil.execute(request, response);
+                    HttpUtil.buildStaticResponse(request, response);
+                }
+                os.write(response.toResult().getBytes());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             } finally {
