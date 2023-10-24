@@ -11,6 +11,11 @@ public class ServerResponse implements Response {
     }
 
     @Override
+    public String toResult() {
+        return null;
+    }
+
+    @Override
     public void setBody(String content) {
 
     }

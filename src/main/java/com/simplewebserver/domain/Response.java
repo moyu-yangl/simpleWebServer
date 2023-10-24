@@ -4,5 +4,7 @@ public interface Response {
 
     void setHead(String head, String content);
 
+    String toResult();
+
     void setBody(String content);
 }

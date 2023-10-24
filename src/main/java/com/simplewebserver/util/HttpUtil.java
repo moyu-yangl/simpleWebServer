@@ -1,6 +1,7 @@
 package com.simplewebserver.util;
 
 import com.simplewebserver.domain.Request;
+import com.simplewebserver.domain.Response;
 import com.simplewebserver.domain.ServerRequest;
 
 import java.util.Arrays;
@@ -64,6 +65,10 @@ public class HttpUtil {
         ServerRequest request = ServerRequest.builder().setHeaders(requestHeader)
                 .setParams(params).build();
         return request;
+    }
+
+    public static String response2String(Response response) {
+        return response.toResult();
     }
 
     public static String buildStaticResponse(String content, long len, int code, String message) {
