@@ -9,6 +9,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -99,9 +101,9 @@ public class HttpUtil {
             response.setHead("Content-Language", "zh-CN");
             response.setHead("Content-Type", "text/html;charset=UTF-8");
             response.setHead("Content-Length", String.valueOf(file.length()));
-            response.setBody(sb.toString(), 200, "ok");
+            response.setBody(sb.toString(), 200);
         } else {
-            response.setBody(sb.toString(), 404, "not find");
+            response.setBody(sb.toString(), 404);
         }
     }
 
@@ -111,7 +113,13 @@ public class HttpUtil {
         return response;
     }
 
-    public static void execute(Request request, Response response) {
-
+    public static void execute(Object o, Request request, Response response) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Method[] declaredMethods = o.getClass().getDeclaredMethods();
+        for (Method method : declaredMethods) {
+            if ("doGet".equals(method.getName())) {
+                method.invoke(o, request, response);
+                return;
+            }
+        }
     }
 }

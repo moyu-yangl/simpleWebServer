@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Test {
-    static class User {
+    public static class User {
         String name;
 
         public User(String name, int age) {

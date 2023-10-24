@@ -6,5 +6,5 @@ public interface Response {
 
     String toResult();
 
-    void setBody(String content, int code, String message);
+    void setBody(String content, int code);
 }

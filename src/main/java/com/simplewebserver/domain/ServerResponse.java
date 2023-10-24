@@ -6,7 +6,6 @@ public class ServerResponse implements Response {
     private Map<String, String> headers;
     private String res;
     private int code;
-    private String message;
 
     @Override
     public void setHead(String head, String content) {
@@ -16,7 +15,7 @@ public class ServerResponse implements Response {
     @Override
     public String toResult() {
         StringBuilder sb = new StringBuilder();
-        sb.append("HTTP/1.1 " + code + " " + message + "\r\n");
+        sb.append("HTTP/1.1 " + code + "\r\n");
         for (String header : headers.keySet()) {
             sb.append(header).append(": ").append(headers.get(header)).append("\r\n");
         }
@@ -26,10 +25,21 @@ public class ServerResponse implements Response {
     }
 
     @Override
-    public void setBody(String content, int code, String message) {
+    public void setBody(String content, int code) {
         this.res = content;
         this.code = code;
-        this.message = message;
+    }
+
+    public void enableJsonResult() {
+        headers.put("Content-Type", "application/json;charset=UTF-8");
+    }
+
+    public void enableCors() {
+        headers.put("Access-Control-Allow-Origin", "*");
+        headers.put("Access-Control-Allow-Credentials", "true");
+        headers.put("Access-Control-Max-Age", "1800");
+        headers.put("Access-Control-Allow-Methods", "GET,POST,PUT,POST,OPTION");
+        headers.put("Access-Control-Allow-Headers", "x-requested-with,content-type");
     }
 
     public static ServerResponseBuilder builder() {
