@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URL;
@@ -68,9 +67,12 @@ public class Container {
         return map;
     }
 
-    public static Object handlerMapping(Map<String, Class> mapping, String path) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+    public static Object handlerMapping(Map<String, Class> mapping, String path) throws InstantiationException, IllegalAccessException {
+        Object o = null;
         Class clazz = mapping.get(path);
-        Object o = clazz.newInstance();
+        if (clazz != null) {
+            o = clazz.newInstance();
+        }
         return o;
     }
 
@@ -85,6 +87,7 @@ public class Container {
         public void run() {
             InputStream is = null;
             OutputStream os = null;
+
             try {
                 is = socket.getInputStream();
                 int i = is.available();
@@ -107,9 +110,12 @@ public class Container {
 //                    HttpUtil.buildStaticResponse(request, response);
                 }
                 os.write(response.toResult().getBytes());
-            } catch (IOException | NoSuchMethodException | InstantiationException | IllegalAccessException |
-                     InvocationTargetException e) {
-                throw new RuntimeException(e);
+            } catch (Exception e) {
+                try {
+                    os.write(HttpUtil.errorRequest().getBytes());
+                } catch (IOException ex) {
+                    System.out.println(ex.getCause());
+                }
             } finally {
                 try {
                     is.close();

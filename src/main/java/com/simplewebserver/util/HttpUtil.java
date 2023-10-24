@@ -20,7 +20,7 @@ public class HttpUtil {
     public static final String[] STATIC;
 
     static {
-        STATIC = new String[]{".html", ".js", ".css"};
+        STATIC = new String[]{".html", ".js", ".css", ".ico"};
     }
 
     public static Request buildRequest(String httpContent) {
@@ -111,6 +111,15 @@ public class HttpUtil {
         Map<String, String> headers = new HashMap<>();
         ServerResponse response = ServerResponse.builder().setHeaders(headers).build();
         return response;
+    }
+
+    public static String errorRequest() {
+        Map<String, String> map = new HashMap<>();
+        ServerResponse response = ServerResponse.builder().setHeaders(map).build();
+        response.setHead("Content-Language", "zh-CN");
+//        response.setHead("Content-Type", "text/html;charset=UTF-8");
+        response.setBody(null, 500);
+        return response.toResult();
     }
 
     public static void execute(Object o, Request request, Response response) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {

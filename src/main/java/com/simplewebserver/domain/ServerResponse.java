@@ -20,7 +20,8 @@ public class ServerResponse implements Response {
             sb.append(header).append(": ").append(headers.get(header)).append("\r\n");
         }
         sb.append("\r\n");
-        sb.append(res);
+        if (res != null)
+            sb.append(res);
         return sb.toString();
     }
 
