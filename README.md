@@ -1,9 +1,9 @@
 # simpleWebServer
 用java实现一个简单的Web服务器容器
 SimpleWebServer
-1.1 介绍
+## 1.1 介绍
 基于Java实现的一个简单仿TomCat的Web容器，允许建立一定的连接，能够获取一些简单的请求和获取返回静态资源，能处理简单的动态资源请求。
-1.2 类介绍
+## 1.2 类介绍
 1. Container
 容器类，用于运行整个web server的容器，所有连接均在这里被进行。
 2. RequestTask
@@ -29,16 +29,16 @@ SimpleWebServer
 此类是用于实现web服务的接口类，要想完成对应的web请求，只需要在规定的路径下创建自己的服务，然后去实现这个接口，并打上注解即可。
 7. ServerAnnotation
 一个注解类，用于实现扫描固定路径下的所有服务，然后获取注解上的请求映射，后续有对应的请求路径过来时可以进行运行。
-2.1 实现需求
+## 2.1 实现需求
 需要明确的是，一个基本的web服务器一定要有的功能：
 1. 能对外开发连接，运行一定数量的客户端同时进行连接
 2. 要能响应静态资源的HTTP请求
 3. 能处理动态资源的HTTP请求
-2.2 实现思路
+## 2.2 实现思路
 
 暂时无法在飞书文档外展示此内容
 
-3.1 测试
+## 3.1 测试
 能够支持简单的动态请求和静态资源请求，由于项目比较简单，所以默认配置了跨域的请求头，并且该web server只支持简单的动态请求，暂未实现从请求体中获取参数。
 1. 请求简单的动态资源：http://localhost:8080/user?userid=dasf&password=dafsasg
 [图片]
@@ -48,7 +48,7 @@ SimpleWebServer
 [图片]
 4. 请求不存在的动态资源：http://localhost:8080/test
 [图片]
-4.1 实现自己的web server
+## 4.1 实现自己的web server
 继承SimpleServer接口，同时在类上标注ServerAnnotation注解，然后在com.simplewebserver.server路径下创建该类即可。
 [图片]
 
