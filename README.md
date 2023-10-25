@@ -37,6 +37,8 @@ SimpleWebServer
 ## 2.2 实现思路
 
 暂时无法在飞书文档外展示此内容
+<img width="1076" alt="image" src="https://github.com/moyu-yangl/simpleWebServer/assets/87761443/b9ed18d4-1801-4b29-9520-57918774687e">
+
 
 ## 3.1 测试
 能够支持简单的动态请求和静态资源请求，由于项目比较简单，所以默认配置了跨域的请求头，并且该web server只支持简单的动态请求，暂未实现从请求体中获取参数。
