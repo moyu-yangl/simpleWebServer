@@ -40,6 +40,14 @@ public class Container {
 
     }
 
+    /**
+     * 加载指定路径下的所有服务，要求：服务在路径下且拥有 {@ServerAnnotation } 注解
+     *
+     * @param path 加载路径
+     * @return
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
     public static Map<String, Class> loadAllServer(String path) throws IOException, ClassNotFoundException {
         Map<String, Class> map = new HashMap<>();
         path = path.replaceAll("\\.", "/");
@@ -67,6 +75,16 @@ public class Container {
         return map;
     }
 
+    /**
+     * 请求路径映射后执行
+     * 根据请求的路径，拿到要执行的服务，执行它的doGet方法
+     *
+     * @param mapping 映射
+     * @param path    请求路径
+     * @return
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     */
     public static Object handlerMapping(Map<String, Class> mapping, String path) throws InstantiationException, IllegalAccessException {
         Object o = null;
         Class clazz = mapping.get(path);
@@ -76,6 +94,9 @@ public class Container {
         return o;
     }
 
+    /**
+     * 一次HTTP请求的执行过程
+     */
     public static class RequestTask extends Thread {
         private Socket socket;
 

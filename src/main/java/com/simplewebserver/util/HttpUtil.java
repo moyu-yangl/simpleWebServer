@@ -23,6 +23,12 @@ public class HttpUtil {
         STATIC = new String[]{".html", ".js", ".css", ".ico"};
     }
 
+    /**
+     * 解析Socket中获取到的请求报文，将其封装为Request
+     *
+     * @param httpContent
+     * @return
+     */
     public static Request buildRequest(String httpContent) {
         String[] content = httpContent.split("\r\n");   // 请求报文
         String[] oneHeader = content[0].split(" ");     // 报文首
@@ -30,7 +36,7 @@ public class HttpUtil {
         String path = oneHeader[1];             // 请求路径与参数
 
         List<String> headers = Arrays.asList(content).subList(1, content.length);
-
+        // 获取请求头
         Map<String, String> requestHeader = new HashMap<>(headers.size());
         for (String head : headers) {
             String[] headerKV = head.split(": ");
@@ -45,7 +51,6 @@ public class HttpUtil {
         /*
         判断是否为静态资源请求
          */
-        boolean jump = false;
         for (String end : STATIC) {
             if (path.endsWith(end)) {
                 params.put("static", path);
@@ -78,7 +83,13 @@ public class HttpUtil {
         return response.toResult();
     }
 
-
+    /**
+     * 构建静态资源的响应报文Response
+     *
+     * @param request
+     * @param response
+     * @throws IOException
+     */
     public static void buildStaticResponse(Request request, Response response) throws IOException {
         String path = request.getParam("static");
         File file = null;
@@ -107,12 +118,24 @@ public class HttpUtil {
         }
     }
 
+    /**
+     * 构建HTTP请求的响应报文
+     *
+     * @param request
+     * @return
+     */
     public static Response buildResponse(Request request) {
         Map<String, String> headers = new HashMap<>();
         ServerResponse response = ServerResponse.builder().setHeaders(headers).build();
         return response;
     }
 
+    /**
+     * 构建错误请求的响应
+     * 使用于服务端发生错误时，会构建一个错误码为500的响应
+     *
+     * @return
+     */
     public static String errorRequest() {
         Map<String, String> map = new HashMap<>();
         ServerResponse response = ServerResponse.builder().setHeaders(map).build();
@@ -122,6 +145,17 @@ public class HttpUtil {
         return response.toResult();
     }
 
+    /**
+     * 执行动态资源请求
+     * 根据获取到的映射，通过反射拿到doGet方法，传递request和response进行执行
+     *
+     * @param o
+     * @param request
+     * @param response
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
+     */
     public static void execute(Object o, Request request, Response response) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Method[] declaredMethods = o.getClass().getDeclaredMethods();
         for (Method method : declaredMethods) {
