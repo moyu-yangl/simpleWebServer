@@ -15,19 +15,24 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class Container {
 
     private static final Map<String, Class> classMap;
+    private static final ThreadPoolExecutor HTTP_SERVER_POOL;
 
     static {
         try {
             classMap = loadAllServer("com.simplewebserver.server");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
+        } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
+        HTTP_SERVER_POOL = new ThreadPoolExecutor(
+                20, 200, 10L, TimeUnit.SECONDS, new ArrayBlockingQueue<>(200)
+        );
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
@@ -35,7 +40,7 @@ public class Container {
         for (; ; ) {
             Socket accept = server.accept();
             RequestTask requestTask = new RequestTask(accept);
-            requestTask.start();
+            HTTP_SERVER_POOL.execute(requestTask);
         }
 
     }
@@ -97,7 +102,7 @@ public class Container {
     /**
      * 一次HTTP请求的执行过程
      */
-    public static class RequestTask extends Thread {
+    public static class RequestTask implements Runnable {
         private Socket socket;
 
         public RequestTask(Socket socket) {

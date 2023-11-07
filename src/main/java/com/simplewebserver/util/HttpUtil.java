@@ -18,7 +18,7 @@ import java.util.Map;
 
 public class HttpUtil {
     public static final String[] STATIC;
-
+    
     static {
         STATIC = new String[]{".html", ".js", ".css", ".ico"};
     }
