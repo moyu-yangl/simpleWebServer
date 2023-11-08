@@ -113,7 +113,6 @@ public class Container {
         public void run() {
             InputStream is = null;
             OutputStream os = null;
-
             try {
                 is = socket.getInputStream();
                 int i = is.available();
@@ -136,6 +135,68 @@ public class Container {
 //                    HttpUtil.buildStaticResponse(request, response);
                 }
                 os.write(response.toResult().getBytes());
+            } catch (Exception e) {
+                try {
+                    os.write(HttpUtil.errorRequest().getBytes());
+                } catch (IOException ex) {
+                    System.out.println(ex.getCause());
+                }
+            } finally {
+                try {
+                    is.close();
+                    os.flush();
+                    os.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+    }
+
+    public static class ManyRequestTask implements Runnable {
+        private Socket socket;
+
+        public ManyRequestTask(Socket socket) {
+            this.socket = socket;
+        }
+
+        @Override
+        public void run() {
+            InputStream is = null;
+            OutputStream os = null;
+            try {
+                int count = 0;
+                while (true) {
+                    is = socket.getInputStream();
+                    int i = is.available();
+                    if (i == 0) {
+                        Thread.sleep(100L);
+                        count++;
+                        continue;
+                    }
+                    byte[] bytes = new byte[i];
+                    int read = is.read(bytes);
+                    String content = new String(bytes);
+                    os = socket.getOutputStream();
+
+                    ServerRequest request = (ServerRequest) HttpUtil.buildRequest(content);
+                    ServerResponse response = (ServerResponse) HttpUtil.buildResponse(request);
+                    response.enableCors();
+
+                    if (!request.getHead("Connection").equals("keep-alive")) {
+                        count = 200;
+                    }
+                    if (request.isStatic()) {
+                        HttpUtil.buildStaticResponse(request, response);
+                    } else {
+                        Object o = handlerMapping(classMap, request.getHead("path"));
+                        HttpUtil.execute(o, request, response);
+                    }
+                    os.write(response.toResult().getBytes());
+                    os.flush();
+                    if (count >= 200)
+                        break;
+                }
             } catch (Exception e) {
                 try {
                     os.write(HttpUtil.errorRequest().getBytes());
