@@ -132,7 +132,6 @@ public class Container {
                 } else {
                     Object o = handlerMapping(classMap, request.getHead("path"));
                     HttpUtil.execute(o, request, response);
-//                    HttpUtil.buildStaticResponse(request, response);
                 }
                 os.write(response.toResult().getBytes());
             } catch (Exception e) {
@@ -146,6 +145,7 @@ public class Container {
                     is.close();
                     os.flush();
                     os.close();
+                    socket.close();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -208,6 +208,7 @@ public class Container {
                     is.close();
                     os.flush();
                     os.close();
+                    socket.close();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

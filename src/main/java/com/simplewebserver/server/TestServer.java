@@ -8,11 +8,30 @@ import com.simplewebserver.domain.SimpleServer;
 import com.simplewebserver.test.Test;
 import com.simplewebserver.util.JsonUtil;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.UUID;
 
 @ServerAnnotation("/user")
 public class TestServer implements SimpleServer {
+
+    public static void main(String[] args) {
+//        System.out.println(8 * 8 * 8 * 8 * 4 % 143);
+        BigDecimal bigDecimal = new BigDecimal("476512");
+        BigDecimal dd = new BigDecimal("476512");
+
+        for (int i = 0; i < 984; i++) {
+            bigDecimal = bigDecimal.multiply(dd);
+        }
+        System.out.println(bigDecimal);
+        long k = 1;
+        long d = 83;
+        for (int i = 0; i < 47; i++) {
+            k *= d % 143;
+            k = k % 143;
+        }
+        System.out.println(k % 143);
+    }
 
     @Override
     public void doGet(Request request, Response response) {
