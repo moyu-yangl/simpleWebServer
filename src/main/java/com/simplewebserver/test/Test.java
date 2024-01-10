@@ -12,7 +12,7 @@ import java.util.concurrent.CountDownLatch;
 
 public class Test {
     public static final int BUFFER_SIZE = 1024 * 8;
-    public static final int SERVER_ADDRESS = 7890;
+    public static final int SERVER_ADDRESS = 9870;
     public static CountDownLatch cd;
 
     public static void main(String[] args) throws InterruptedException {
@@ -34,9 +34,10 @@ public class Test {
                 serverSocketChannel.socket().bind(inetSocketAddress);
                 serverSocketChannel.configureBlocking(false);
                 serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
-                for (; ; ) {
-                    selector.select(2000);
-
+                to:
+                for (; selector.select() > 0; ) {
+//                    selector.select(2000);
+//                    Thread.sleep(10L);
                     Set<SelectionKey> selectionKeys = selector.selectedKeys();
                     Iterator<SelectionKey> iterator = selectionKeys.iterator();
                     while (iterator.hasNext()) {
@@ -44,13 +45,18 @@ public class Test {
                         if (con.isAcceptable()) {
                             SocketChannel accept = serverSocketChannel.accept();
                             accept.configureBlocking(false);
-                            System.out.println("client:" + accept.getLocalAddress() + " is connect");
+                            System.out.println("client:" + accept.getRemoteAddress() + " is connect");
                             accept.register(selector, SelectionKey.OP_READ);
                         } else if (con.isReadable()) {
                             ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
                             SocketChannel channel = (SocketChannel) con.channel();
-                            int read = channel.read(byteBuffer);
-                            System.out.println("client:" + channel.getLocalAddress() + " send " + new String(byteBuffer.array(), 0, read));
+                            int len = 0;
+                            while ((len = channel.read(byteBuffer)) > 0) {
+                                if (new String(byteBuffer.array(), 0, len).equals("quit")) {
+                                    break to;
+                                }
+                                System.out.println("client:" + channel.getLocalAddress() + " send " + new String(byteBuffer.array(), 0, len));
+                            }
                         }
                         iterator.remove();
                     }
@@ -79,11 +85,13 @@ public class Test {
                         System.out.println("客户端正在连接中，请耐心等待");
                     }
                 }
-                while (true) {
-                    Thread.sleep(500L);
-                    ByteBuffer byteBuffer = ByteBuffer.wrap("java nio test".getBytes());
-                    socketChannel.write(byteBuffer);
-                }
+//                while (true) {
+                Thread.sleep(500L);
+//                ByteBuffer byteBuffer = ByteBuffer.wrap("quit".getBytes());
+                ByteBuffer byteBuffer = ByteBuffer.wrap("java nio test".getBytes());
+//                byteBuffer.flip();
+                socketChannel.write(byteBuffer);
+//                }
 
             } catch (Exception e) {
                 System.out.println(e.getMessage());

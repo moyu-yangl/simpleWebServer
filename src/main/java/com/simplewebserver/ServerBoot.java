@@ -19,7 +19,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-public class Container {
+public class ServerBoot {
 
     private static final Map<String, Class> classMap;
     private static final ThreadPoolExecutor HTTP_SERVER_POOL;
@@ -35,11 +35,11 @@ public class Container {
         );
     }
 
-    public static void main(String[] args) throws IOException, ClassNotFoundException {
+    public static void main(String[] args) throws IOException {
         ServerSocket server = new ServerSocket(8080);
         for (; ; ) {
             Socket accept = server.accept();
-            RequestTask requestTask = new RequestTask(accept);
+            ServerBoot.RequestTask requestTask = new ServerBoot.RequestTask(accept);
             HTTP_SERVER_POOL.execute(requestTask);
         }
 
