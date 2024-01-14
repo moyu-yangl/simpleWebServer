@@ -1,35 +1,27 @@
 package com.simplewebserver.component;
 
-import com.simplewebserver.exception.LifecycleException;
+import com.simplewebserver.exception.LifeCycleException;
 
-public interface Component extends Lifecycle {
+// 默认实现所有的生命周期方法
+public class Component extends AbstractLifeCycle {
+
     @Override
-    default void start() throws LifecycleException {
+    protected void initInternal() throws LifeCycleException {
 
     }
 
     @Override
-    default void init() throws LifecycleException {
+    protected void startInternal() throws LifeCycleException {
 
     }
 
     @Override
-    default void stop() throws LifecycleException {
+    protected void restartInternal() throws LifeCycleException {
 
     }
 
     @Override
-    default void close() throws LifecycleException {
-
-    }
-
-    @Override
-    default LifecycleState getState() {
-        return null;
-    }
-
-    @Override
-    default void addLifecycleListener(LifecycleListener listener) {
+    protected void destroyInternal() throws LifeCycleException {
 
     }
 }

@@ -1,26 +1,55 @@
 package com.simplewebserver;
 
 import com.simplewebserver.component.Component;
-import com.simplewebserver.exception.LifecycleException;
+import com.simplewebserver.exception.LifeCycleException;
+import com.simplewebserver.network.endpoint.nio.NioEndpoint;
 
-public class Boot implements Component {
+import java.util.Scanner;
+
+public class Boot extends Component {
+
+//    private Connector connector;
 
     public static void main(String[] args) {
-        Boot boot = new Boot();
-        try {
-            boot.init();
-        } catch (LifecycleException e) {
-            throw new RuntimeException(e);
+        NioEndpoint nioEndpoint = new NioEndpoint();
+        nioEndpoint.start(8080);
+        Scanner scanner = new Scanner(System.in);
+        String order;
+        while (scanner.hasNext()) {
+            order = scanner.next();
+            if (order.equals("EXIT")) {
+                nioEndpoint.close();
+                System.exit(0);
+            }
         }
-        try {
-            boot.start();
-        } catch (LifecycleException e) {
-            throw new RuntimeException(e);
-        }
+//        Boot boot = new Boot();
+//        try {
+//            boot.init();
+//        } catch (LifeCycleException e) {
+//            throw new RuntimeException(e);
+//        }
+//        try {
+//            boot.start();
+//        } catch (LifeCycleException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 
+    @Override
+    protected void initInternal() throws LifeCycleException {
+        createConnector();
+        createProcessor();
+    }
 
-    private void createConnector() {
+    @Override
+    protected void startInternal() throws LifeCycleException {
+        startConnector();
+        startProcessor();
+    }
+
+    private void createConnector() throws LifeCycleException {
+//        connector = Connector.getInstance();
+//        connector.init();
 
     }
 
@@ -29,28 +58,13 @@ public class Boot implements Component {
     }
 
 
-    private void startConnector() {
-
+    private void startConnector() throws LifeCycleException {
+//        connector.start();
     }
 
     private void startProcessor() {
 
     }
 
-    @Override
-    public void start() throws LifecycleException {
-        Component.super.start();
-    }
 
-    @Override
-    public void init() throws LifecycleException {
-        Component.super.init();
-    }
-
-
-    @Override
-    public void close() throws LifecycleException {
-
-    }
-    
 }
